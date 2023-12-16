@@ -1,16 +1,17 @@
 import axios from "axios";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
+import ModulesList from "../components/ModulesList";
 
-export const postRequest = async (selectedAccount: InjectedAccountWithMeta | null) => {
-  const endpoint = "http://167.99.229.96:50088/info";
+export const postRequest = async (selectedAccount: InjectedAccountWithMeta | null, callback: (data: string[]) => void) => {
+  const endpoint = "http://24.83.20.198:2750/modules";
 
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
   const serverData = {
     args: [],
     kwargs: {},
-    ip: "167.99.229.96",
+    ip: "24.83.20.198",
     timestamp: currentTimestamp,
     hash: "9b44a42788425d19de82f930640e41b2a56f4e3b25eccca50a90b95e79ede994",
   };
@@ -42,15 +43,17 @@ export const postRequest = async (selectedAccount: InjectedAccountWithMeta | nul
       const response = await axios.post(endpoint, data);
       console.log("Raw Response:", response.data);
 
-      const jsonResponse = response.data.substring(response.data.indexOf("{"));
-      const parsedResponse = JSON.parse(jsonResponse);
+      // const jsonResponse = response.data.substring(response.data.indexOf("{"));
+      // const parsedResponse = JSON.parse(jsonResponse);
 
-      if (parsedResponse && parsedResponse.data) {
-        const nestedData = JSON.parse(parsedResponse.data);
+      if (response.data && response.data.data) {
+        const nestedData = JSON.parse(response.data.data);
         console.log("Nested Data:", nestedData);
 
         const finalData = nestedData.data;
         console.log("Final Data:", finalData);
+
+        callback(finalData); // Wywołanie callback z danymi
       }
     } else {
       throw new Error("The method signRaw is not available on the signer");
